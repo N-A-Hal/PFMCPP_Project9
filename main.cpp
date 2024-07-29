@@ -51,6 +51,27 @@ struct Wrapper
     { 
         std::cout << "Wrapper(" << typeid(val).name() << ")" << std::endl; 
     }
+    void print() const
+    {
+        std::cout << "Wrapper::print(" << val << ")" << std::endl;
+    }
+private:
+    Type val;
+};
+
+template<>
+struct Wrapper<Point>
+{
+    Wrapper(Point&& t) : val(std::move(t))
+    {
+        std::cout << "Wrapper(Point&&)" << std::endl;
+    }
+    void print() const
+    {
+        std::cout << val.toString() << std::endl;
+    }
+private:
+    Point val;
 };
 
 /*
@@ -66,6 +87,21 @@ struct Wrapper
 
  Wait for my code review.
  */
+
+template<typename T>
+void variadicHelper(T first)
+{
+    Wrapper<T> w(std::move(first));
+    w.print();
+}
+
+template<typename T, typename ...Args>
+void variadicHelper(T first, Args ... everythingElse)
+{
+    Wrapper<T> w(std::move(first));
+    w.print();
+    variadicHelper(everythingElse ...);
+}
 
 int main()
 {
